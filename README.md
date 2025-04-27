@@ -33,7 +33,13 @@ Play directly in your browser:
 
 ## Installation
 
-1. Clone this repository:
    ```bash
    git clone https://github.com/IamMepl/Tic-Tac-Toe.git
    ```
+
+## 🤝 Contributing
+
+Found a bug or have a suggestion?  
+1. Open an issue
+2. Fork the repository
+3. Create a pull request
