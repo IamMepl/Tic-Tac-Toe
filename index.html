@@ -1,0 +1,50 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tic Tac Toe</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/png" href="favicon.png">
+</head>
+<body>
+
+  <div id="home" class="screen">
+    <h1>Tic Tac Toe</h1>
+
+    <label for="boardSize">Choose Board Size:</label>
+    <select id="boardSize">
+      <option value="3">3 x 3</option>
+      <option value="6">6 x 6</option>
+      <option value="8">8 x 8</option>
+    </select>
+
+    <label for="firstPlayer">Who Plays First?</label>
+    <select id="firstPlayer">
+      <option value="player">Player</option>
+      <option value="computer">Computer</option>
+    </select>
+
+    <button id="startButton">Start Game</button>
+  </div>
+
+  <div id="game" class="screen hidden">
+    <h2 id="turnInfo">Your Turn</h2>
+    <div id="timer">Time Left: 20s</div>
+    <div id="timerBarContainer">
+      <div id="timerBar"></div>
+    </div>
+    <div id="board"></div>
+    <button id="backHome" class="small">Back to Home</button>
+  </div>
+
+  <div id="result" class="screen hidden">
+    <h1 id="resultText"></h1>
+    <button id="rematchButton">Rematch</button>
+    <button id="homeButton">Home</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
