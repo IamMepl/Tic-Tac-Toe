@@ -43,3 +43,7 @@ Found a bug or have a suggestion?
 1. Open an issue
 2. Fork the repository
 3. Create a pull request
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
