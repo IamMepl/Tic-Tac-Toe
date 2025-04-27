@@ -1,4 +1,3 @@
-
 const homeScreen = document.getElementById('home');
 const gameScreen = document.getElementById('game');
 const resultScreen = document.getElementById('result');
@@ -21,6 +20,9 @@ let boardSize = 3;
 let playerTurn = true;
 let timer;
 let timeLeft = 20;
+
+let playerScore = 0;
+let computerScore = 0;
 
 startButton.addEventListener('click', startGame);
 backHomeButton.addEventListener('click', () => {
@@ -46,6 +48,8 @@ function startGame() {
   playerTurn = (firstPlayerSelect.value === 'player');
   renderBoard();
   showScreen(gameScreen);
+
+  updateScoreboard();
 
   if (playerTurn) {
     turnInfo.innerText = "Your Turn";
@@ -94,6 +98,11 @@ function updateTimerUI() {
   timerBar.style.width = `${(timeLeft / 20) * 100}%`;
 }
 
+function updateScoreboard() {
+  document.getElementById('playerScore').innerText = playerScore;
+  document.getElementById('computerScore').innerText = computerScore;
+}
+
 function playerMove(event) {
   if (!playerTurn) return;
 
@@ -108,6 +117,8 @@ function playerMove(event) {
   clearInterval(timer);
 
   if (checkWin('X')) {
+    playerScore++;
+    updateScoreboard();
     endGame('You Win!');
     return;
   }
@@ -139,6 +150,8 @@ function computerMove() {
   renderBoard();
 
   if (checkWin('O')) {
+    computerScore++;
+    updateScoreboard();
     endGame('Computer Wins!');
     return;
   }
@@ -171,6 +184,8 @@ function autoPlayerMove() {
   renderBoard();
 
   if (checkWin('X')) {
+    playerScore++;
+    updateScoreboard();
     endGame('You Win!');
     return;
   }
