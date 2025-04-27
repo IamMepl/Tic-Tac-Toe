@@ -29,11 +29,11 @@ A customizable Tic Tac Toe game with multiple board sizes and player options.
 ## 🚀 Try It Out
 
 Play directly in your browser:  
-👉 [Live Demo on GitHub Pages](https://IamMepl.github.io/tic-tac-toe)
+👉 [Live Demo on GitHub Pages](https://iammepl.github.io/Tic-Tac-Toe/)
 
 ## Installation
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/your-username/tic-tac-toe.git
+   git clone https://github.com/IamMepl/Tic-Tac-Toe.git
    ```
