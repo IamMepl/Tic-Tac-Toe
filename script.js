@@ -23,10 +23,10 @@ let timer;
 let timeLeft = 20;
 let winCondition = 3;
 let difficulty = "easy";
-
 let playerScore = 0;
 let computerScore = 0;
-const score = { X: 0, O: 0 };
+let score = { X: 0, O: 0 };
+const targetScore = 3; 
 
 // Event Listeners
 startButton.addEventListener('click', startGame);
@@ -102,17 +102,19 @@ function playerMove(event) {
   renderBoard();
   clearInterval(timer);
 
-  const winningCells = checkWin('X');
-  if (winningCells) {
-    highlightWinningCells(winningCells);
-    score.X++;
-    updateScoreboard();
-    setTimeout(() => endGame('You Win!'), 1000);
-    return;
+  if (difficulty === "hard") {
+    const winningCells = checkWin('X');
+    if (winningCells) {
+      highlightWinningCells(winningCells);
+      score.X++;
+      updateScoreboard();
+      checkEndOrNext('You win the round!');
+      return;
+    }
   }
 
   if (checkDraw()) {
-    endGame('Draw!');
+    checkEndOrNext('Draw!');
     return;
   }
 
@@ -120,40 +122,71 @@ function playerMove(event) {
   setTimeout(computerMove, 700);
 }
 
-function computerMove() {
-  let move;
-  
-  if (difficulty === "easy") {
-    move = getRandomMove();
-  } 
-  else if (difficulty === "medium") {
-    move = findStrategicMove('O', 'X') || getRandomMove();
+function checkEndOrNext(message) {
+  clearInterval(timer);
+
+  if (score.X >= 3) {
+    setTimeout(() => endGame('You win the match!'), 1000);
+  } else if (score.O >= 3) {
+    setTimeout(() => endGame('Computer wins the match!'), 1000);
+  } else {
+    
+    showNextRound(message);
   }
-  else { // hard
-    move = findStrategicMove('O', 'X') || findStrategicMove('X', 'O') || getRandomMove();
+}
+
+  const cellElement = document.querySelector(`.cell[data-row="${move.i}"][data-col="${move.j}"]`);
+  if (cellElement) {
+    cellElement.classList.add('computer-move');
+    setTimeout(() => cellElement.classList.remove('computer-move'), 2000);
   }
 
-  board[move.i][move.j] = 'O';
-  renderBoard();
-
-  const winningCells = checkWin('O');
-  if (winningCells) {
-    highlightWinningCells(winningCells);
-    score.O++;
-    updateScoreboard();
-    setTimeout(() => endGame('Computer Wins!'), 1000);
-    return;
+  if (difficulty === "hard") {
+    const winningCells = checkWin('O');
+    if (winningCells) {
+      highlightWinningCells(winningCells);
+      score.O++;
+      updateScoreboard();
+      checkEndOrNext('Computer wins the round!');
+      return;
+    }
   }
 
   if (checkDraw()) {
-    endGame('Draw!');
+    checkEndOrNext('Draw!');
     return;
   }
 
   playerTurn = true;
   turnInfo.innerText = "Your Turn";
   startTimer();
+}function checkEndOrNext(message) {
+  clearInterval(timer);
+
+  if (score.X >= 3) {
+    setTimeout(() => endGame('You win the match!'), 1000);
+  } else if (score.O >= 3) {
+    setTimeout(() => endGame('Computer wins the match!'), 1000);
+  } else {
+    
+    showNextRound(message);
+  }
 }
+
+function startNewRound() {
+  board = Array(boardSize).fill(null).map(() => Array(boardSize).fill(''));
+  playerTurn = (firstPlayerSelect.value === "player");
+  renderBoard();
+
+  if (playerTurn) {
+    turnInfo.innerText = "Your Turn";
+    startTimer();
+  } else {
+    turnInfo.innerText = "Computer's Turn...";
+    setTimeout(computerMove, 1000);
+  }
+}
+
 
 // Helper Functions
 function getRandomMove() {
