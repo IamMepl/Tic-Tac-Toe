@@ -2,42 +2,48 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Tic Tac Toe</title>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/png" href="favicon.png">
 </head>
 <body>
-  <div class="container">
+
+  <div id="home" class="screen">
     <h1>Tic Tac Toe</h1>
-    <div class="settings">
-      <select id="boardSize">
-        <option value="3">3x3</option>
-        <option value="6">6x6</option>
-        <option value="8">8x8</option>
-      </select>
-      <select id="difficulty">
-        <option value="easy">Easy</option>
-        <option value="medium">Medium</option>
-        <option value="hard">Hard</option>
-      </select>
-      <select id="firstMove">
-        <option value="player">Player First</option>
-        <option value="computer">Computer First</option>
-      </select>
-      <button onclick="startGame()">Start Game</button>
-    </div>
-    <div class="scoreboard">
-      <div>Player: <span id="playerScore">0</span></div>
-      <div>Computer: <span id="computerScore">0</span></div>
-    </div>
-    <div id="timer">Time left: 20s</div>
-    <div id="gameBoard" class="board"></div>
-    <div class="controls">
-      <button onclick="rematch()">Rematch</button>
-    </div>
+
+    <label for="boardSize">Choose Board Size:</label>
+    <select id="boardSize">
+      <option value="3">3 x 3</option>
+      <option value="6">6 x 6</option>
+      <option value="8">8 x 8</option>
+    </select>
+
+    <label for="firstPlayer">Who Plays First?</label>
+    <select id="firstPlayer">
+      <option value="player">Player</option>
+      <option value="computer">Computer</option>
+    </select>
+
+    <button id="startButton">Start Game</button>
   </div>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <div id="game" class="screen hidden">
+    <h2 id="turnInfo">Your Turn</h2>
+    <div id="timer">Time Left: 20s</div>
+    <div id="timerBarContainer">
+      <div id="timerBar"></div>
+    </div>
+    <div id="board"></div>
+    <button id="backHome" class="small">Back to Home</button>
+  </div>
+
+  <div id="result" class="screen hidden">
+    <h1 id="resultText"></h1>
+    <button id="rematchButton">Rematch</button>
+    <button id="homeButton">Home</button>
+  </div>
+
   <script src="script.js"></script>
 </body>
 </html>
