@@ -1,139 +1,225 @@
+const homeScreen = document.getElementById('home');
+const gameScreen = document.getElementById('game');
+const resultScreen = document.getElementById('result');
+
+const boardElement = document.getElementById('board');
+const boardSizeSelect = document.getElementById('boardSize');
+const firstPlayerSelect = document.getElementById('firstPlayer');
+const startButton = document.getElementById('startButton');
+const backHomeButton = document.getElementById('backHome');
+const turnInfo = document.getElementById('turnInfo');
+const timerElement = document.getElementById('timer');
+const timerBar = document.getElementById('timerBar');
+
+const resultText = document.getElementById('resultText');
+const rematchButton = document.getElementById('rematchButton');
+const homeButton = document.getElementById('homeButton');
+
 let board = [];
-let currentPlayer = 'X';
-let playerScore = 0;
-let computerScore = 0;
+let boardSize = 3;
+let playerTurn = true;
 let timer;
 let timeLeft = 20;
-let gameOver = false;
-let boardSize = 3;
-let difficulty = "easy";
+
+startButton.addEventListener('click', startGame);
+backHomeButton.addEventListener('click', () => {
+  clearInterval(timer);
+  showScreen(homeScreen);
+});
+rematchButton.addEventListener('click', startGame);
+homeButton.addEventListener('click', () => {
+  clearInterval(timer);
+  showScreen(homeScreen);
+});
+
+function showScreen(screen) {
+  homeScreen.classList.add('hidden');
+  gameScreen.classList.add('hidden');
+  resultScreen.classList.add('hidden');
+  screen.classList.remove('hidden');
+}
 
 function startGame() {
-  boardSize = parseInt(document.getElementById('boardSize').value);
-  difficulty = document.getElementById('difficulty').value;
-  const firstMove = document.getElementById('firstMove').value;
-  board = Array(boardSize).fill().map(() => Array(boardSize).fill(''));
-  currentPlayer = firstMove === "player" ? 'X' : 'O';
-  gameOver = false;
+  boardSize = parseInt(boardSizeSelect.value);
+  board = Array(boardSize).fill(null).map(() => Array(boardSize).fill(''));
+  playerTurn = (firstPlayerSelect.value === 'player');
   renderBoard();
-  resetTimer();
-  if (currentPlayer === 'O') setTimeout(computerMove, 500);
+  showScreen(gameScreen);
+
+  if (playerTurn) {
+    turnInfo.innerText = "Your Turn";
+    startTimer();
+  } else {
+    turnInfo.innerText = "Computer's Turn...";
+    setTimeout(computerMove, 1000);
+  }
 }
 
 function renderBoard() {
-  const boardDiv = document.getElementById('gameBoard');
-  boardDiv.innerHTML = '';
-  boardDiv.style.gridTemplateColumns = `repeat(${boardSize}, 60px)`;
-  boardDiv.style.gridTemplateRows = `repeat(${boardSize}, 60px)`;
-  board.forEach((row, i) => {
-    row.forEach((cell, j) => {
-      const cellDiv = document.createElement('div');
-      cellDiv.className = 'cell';
-      cellDiv.textContent = cell;
-      cellDiv.onclick = () => handleMove(i, j);
-      boardDiv.appendChild(cellDiv);
-    });
-  });
-}
+  boardElement.innerHTML = '';
+  boardElement.style.gridTemplateColumns = `repeat(${boardSize}, 1fr)`;
 
-function handleMove(i, j) {
-  if (board[i][j] || gameOver) return;
-  board[i][j] = currentPlayer;
-  resetTimer();
-  checkWin();
-  currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-  renderBoard();
-  if (currentPlayer === 'O' && !gameOver) setTimeout(computerMove, 500);
-}
-
-function computerMove() {
-  if (gameOver) return;
-  let move = findBestMove();
-  board[move.i][move.j] = currentPlayer;
-  resetTimer();
-  checkWin();
-  currentPlayer = 'X';
-  renderBoard();
-}
-
-function findBestMove() {
-  let moves = [];
   for (let i = 0; i < boardSize; i++) {
     for (let j = 0; j < boardSize; j++) {
-      if (!board[i][j]) moves.push({i, j});
-    }
-  }
-  if (difficulty === "easy") {
-    return moves[Math.floor(Math.random() * moves.length)];
-  } else if (difficulty === "medium") {
-    return moves[0];
-  } else {
-    return moves[Math.floor(Math.random() * moves.length)];
-  }
-}
-
-function checkWin() {
-  let needed = boardSize === 3 ? 3 : boardSize === 6 ? 4 : 5;
-  for (let i = 0; i < boardSize; i++) {
-    for (let j = 0; j < boardSize; j++) {
-      if (board[i][j]) {
-        if (checkDirection(i, j, 1, 0, needed) || checkDirection(i, j, 0, 1, needed) || 
-            checkDirection(i, j, 1, 1, needed) || checkDirection(i, j, 1, -1, needed)) {
-          highlightWin(i, j);
-          if (board[i][j] === 'X') playerScore++;
-          else computerScore++;
-          updateScore();
-          shake();
-          confetti();
-        }
-      }
+      const cell = document.createElement('div');
+      cell.classList.add('cell');
+      cell.dataset.row = i;
+      cell.dataset.col = j;
+      cell.innerText = board[i][j];
+      cell.addEventListener('click', playerMove);
+      boardElement.appendChild(cell);
     }
   }
 }
 
-function checkDirection(x, y, dx, dy, needed) {
-  let count = 0;
-  for (let i = 0; i < needed; i++) {
-    if (board[x + i*dx] && board[x + i*dx][y + i*dy] === board[x][y]) count++;
-    else break;
-  }
-  return count === needed;
-}
-
-function highlightWin(x, y) {
-  const boardDiv = document.getElementById('gameBoard');
-  const cells = boardDiv.children;
-  for (let k = 0; k < cells.length; k++) {
-    cells[k].classList.remove('highlight');
-  }
-  cells[x * boardSize + y].classList.add('highlight');
-}
-
-function updateScore() {
-  document.getElementById('playerScore').textContent = playerScore;
-  document.getElementById('computerScore').textContent = computerScore;
-}
-
-function resetTimer() {
+function startTimer() {
   clearInterval(timer);
   timeLeft = 20;
-  document.getElementById('timer').textContent = `Time left: ${timeLeft}s`;
+  updateTimerUI();
+
   timer = setInterval(() => {
     timeLeft--;
-    document.getElementById('timer').textContent = `Time left: ${timeLeft}s`;
+    updateTimerUI();
+
     if (timeLeft <= 0) {
       clearInterval(timer);
-      if (currentPlayer === 'X') computerMove();
-      else handleMove(findBestMove().i, findBestMove().j);
+      autoPlayerMove();
     }
   }, 1000);
 }
 
-function rematch() {
-  startGame();
+function updateTimerUI() {
+  timerElement.innerText = `Time Left: ${timeLeft}s`;
+  timerBar.style.width = `${(timeLeft / 20) * 100}%`;
 }
 
-function shake() {
-  document.body.classList.add('shake');
-  setTimeout(() => document.body.classList.remove('shake'), 500);
+function playerMove(event) {
+  if (!playerTurn) return;
+
+  const row = event.target.dataset.row;
+  const col = event.target.dataset.col;
+
+  if (board[row][col] !== '') return;
+
+  board[row][col] = 'X';
+  playerTurn = false;
+  renderBoard();
+  clearInterval(timer);
+
+  if (checkWin('X')) {
+    endGame('You Win!');
+    return;
+  }
+
+  if (checkDraw()) {
+    endGame('Draw!');
+    return;
+  }
+
+  turnInfo.innerText = "Computer's Turn...";
+  setTimeout(computerMove, 700);
 }
+
+function computerMove() {
+  const emptyCells = [];
+  for (let i = 0; i < boardSize; i++) {
+    for (let j = 0; j < boardSize; j++) {
+      if (board[i][j] === '') {
+        emptyCells.push({ i, j });
+      }
+    }
+  }
+
+  if (emptyCells.length === 0) return;
+
+  const move = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+  board[move.i][move.j] = 'O';
+
+  renderBoard();
+
+  if (checkWin('O')) {
+    endGame('Computer Wins!');
+    return;
+  }
+
+  if (checkDraw()) {
+    endGame('Draw!');
+    return;
+  }
+
+  playerTurn = true;
+  turnInfo.innerText = "Your Turn";
+  startTimer();
+}
+
+function autoPlayerMove() {
+  const emptyCells = [];
+  for (let i = 0; i < boardSize; i++) {
+    for (let j = 0; j < boardSize; j++) {
+      if (board[i][j] === '') {
+        emptyCells.push({ i, j });
+      }
+    }
+  }
+
+  if (emptyCells.length === 0) return;
+
+  const move = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+  board[move.i][move.j] = 'X';
+  playerTurn = false;
+  renderBoard();
+
+  if (checkWin('X')) {
+    endGame('You Win!');
+    return;
+  }
+
+  if (checkDraw()) {
+    endGame('Draw!');
+    return;
+  }
+
+  turnInfo.innerText = "Computer's Turn...";
+  setTimeout(computerMove, 700);
+}
+
+function checkWin(player) {
+  // Check rows
+  for (let i = 0; i < boardSize; i++) {
+    if (board[i].every(cell => cell === player)) return true;
+  }
+
+  // Check columns
+  for (let j = 0; j < boardSize; j++) {
+    let win = true;
+    for (let i = 0; i < boardSize; i++) {
+      if (board[i][j] !== player) {
+        win = false;
+        break;
+      }
+    }
+    if (win) return true;
+  }
+
+  // Check diagonals
+  let winDiag1 = true;
+  let winDiag2 = true;
+  for (let i = 0; i < boardSize; i++) {
+    if (board[i][i] !== player) winDiag1 = false;
+    if (board[i][boardSize - i - 1] !== player) winDiag2 = false;
+  }
+  if (winDiag1 || winDiag2) return true;
+
+  return false;
+}
+
+function checkDraw() {
+  return board.every(row => row.every(cell => cell !== ''));
+}
+
+function endGame(message) {
+  clearInterval(timer);
+  resultText.innerText = message;
+  showScreen(resultScreen);
+}
+  
